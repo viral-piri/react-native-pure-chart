@@ -17,9 +17,6 @@ export default class ColumnChart extends Component {
       guideArray: newState.guideArray,
       gap: defaultGap
     }
-
-    this.scrollView = null
-
     this.renderColumns = this.renderColumns.bind(this)
     this.handleClick = this.handleClick.bind(this)
     this.drawTooltip = this.drawTooltip.bind(this)
@@ -35,24 +32,10 @@ export default class ColumnChart extends Component {
     }
   }
 
-  componentDidUpdate(nextProps, nextState){
-    if(this.scrollView != null && nextState.max == 0){
-      setTimeout(
-        () => this.scrollView.scrollTo(this.props.initialScrollPosition), this.props.initialScrollTimeOut
-      )
-    }
-  }
-
   componentDidMount () {
     Animated.timing(this.state.fadeAnim, {
       toValue: 1, easing: Easing.bounce, duration: 1000, useNativeDriver: true
     }).start()
-    if(this.scrollView != null){
-      setTimeout(
-        () => this.scrollView.scrollTo(this.props.initialScrollPosition), this.props.initialScrollTimeOut
-      )
-    }
-    
   }
 
   renderColumns (fadeAnim) {
@@ -69,7 +52,6 @@ export default class ColumnChart extends Component {
             defaultWidth={this.props.defaultColumnWidth}
             defaultHeight={this.props.height + 20}
             defaultMargin={this.props.defaultColumnMargin}
-            defaultBorderColor={this.props.defaultBorderColor}
             isSelected={this.state.selectedIndex === i}
             highlightColor={this.props.highlightColor}
             onClick={(evt) => this.handleClick(evt, i)} />
@@ -147,11 +129,10 @@ export default class ColumnChart extends Component {
         backgroundColor: this.props.backgroundColor
       }])}>
         <View style={{paddingRight: 5}}>
-          {this.props.showYAxisLabel &&
-            drawYAxisLabels(this.state.guideArray, this.props.height + 20, this.props.minValue, this.props.labelColor, this.props.yAxisSymbol)}
+          {drawYAxisLabels(this.state.guideArray, this.props.height + 20, this.props.minValue, this.props.labelColor)}
         </View>
         <View style={styles.mainContainer}>
-          <ScrollView ref={scrollView => this.scrollView = scrollView} horizontal>
+          <ScrollView horizontal>
             <View>
               <View ref='chartView' style={styles.chartContainer}>
                 {drawYAxis(this.props.yAxisColor)}
@@ -160,8 +141,7 @@ export default class ColumnChart extends Component {
               </View>
               {drawXAxis(this.props.xAxisColor)}
               <View style={{ marginLeft: this.props.defaultColumnWidth / 2 }}>
-                {this.props.showXAxisLabel &&
-                  drawXAxisLabels(this.state.sortedData[0].data, this.state.gap, this.props.labelColor, this.props.showEvenNumberXaxisLabel)}
+                {drawXAxisLabels(this.state.sortedData[0].data, this.state.gap, this.props.labelColor, this.props.showEvenNumberXaxisLabel)}
               </View>
             </View>
             {this.drawTooltip(this.state.selectedIndex)}
@@ -229,13 +209,7 @@ ColumnChart.defaultProps = {
   height: 100,
   defaultColumnWidth: 40,
   defaultColumnMargin: 20,
-  defaultBorderColor: '#FFFFFF',
   primaryColor: '#297AB1',
   highlightColor: 'red',
-  showEvenNumberXaxisLabel: true,
-  initialScrollPosition: {x: 0, y: 0, animated: true},
-  initialScrollTimeOut: 300,
-  showYAxisLabel: true,
-  showXAxisLabel: true,
-  yAxisSymbol: ''
+  showEvenNumberXaxisLabel: true
 }
